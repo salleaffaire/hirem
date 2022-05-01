@@ -13,7 +13,7 @@ module.exports = {
   findAll: (accountsFilter) => {
     const query = Account.query().debug().where('status', null)
     if (accountsFilter) {
-      query.whereIn('id', accountsFilter)
+      query.whereIn('belongsTo', accountsFilter)
     }
     return query
   },

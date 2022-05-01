@@ -5,10 +5,32 @@ const accountCreateSchema = require('../utils/validation').accountCreateSchema
 const validator = require('../utils/validation').validate
 
 module.exports = AccountModel => {
+  const childrenAccounts = async (id, level) => {
+    let accountListLevel = [id]
+    const accountList = []
+    while (level >= 0) {
+      // console.log(`level ${level} : ${id}`)
+
+      const accountForLevel = []
+      for (let i = 0; i < accountListLevel.length; i++) {
+        const accounts = await AccountModel.findByBelongsTo(accountListLevel[i])
+        // console.log({ accounts })
+        // Push in the current level list
+        accountForLevel.push(...accounts)
+        // Push in the big list
+        accountList.push(...accounts)
+      }
+      accountListLevel = accountForLevel.map(e => { return e.id }).filter(e => e !== id)
+
+      level = level - 1
+    }
+    console.log({ accountList })
+  }
+
   /* Return all accounts user has permissions to access */
   const listAccounts = async (req, res, next) => {
     try {
-      const accountList = await AccountModel.findAll(req.accountsFilter)
+      const accountList = await AccountModel.findAll(req.belongsToFilter)
 
       res.json(accountList)
     } catch (err) {
@@ -68,6 +90,7 @@ module.exports = AccountModel => {
   return {
     listAccounts,
     getAccount,
-    createAccount
+    createAccount,
+    childrenAccounts
   }
 }

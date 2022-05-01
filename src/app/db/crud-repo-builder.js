@@ -8,6 +8,7 @@ module.exports = (Model) => ({
   model: Model,
   insert: (insertData) => Model.query().debug().insertAndFetch({ belongsTo: getAccountName(), createdBy: getUserName(), ...insertData }),
   findById: (id) => Model.query().debug().findOne({ id, status: null }),
+  findByBelongsTo: (id) => Model.query().debug().where({ id, status: null }),
   findByName: (name) => Model.query().debug().findOne({ name, status: null }),
   updateById: (id, updateData) => Model.query().debug().patchAndFetchById(id, { updatedBy: getUserName(), ...updateData }),
   deleteById: (id) => Model.query().debug().patchAndFetchById(id, { updatedBy: getUserName(), status: 'DELETED' }),

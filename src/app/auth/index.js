@@ -17,8 +17,16 @@ const passThroughAuthHandler = (req, res, next) => {
     { name: authConfig.testAccountName, id: authConfig.testAccountId }, // Account
     {
       permissions: [ // Permissions
-        'hirem.accounts.*.r',
-        'hirem.accounts.*.w'
+        {
+          resource: 'hirem.accounts',
+          action: 'r',
+          scope: '@'
+        },
+        {
+          resource: 'hirem.accounts',
+          action: 'w',
+          scope: '@'
+        }
       ]
     })
 
