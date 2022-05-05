@@ -1,6 +1,6 @@
 # hirem
 
-HIerarchic REsource Manager
+HIerarchical REsource Manager
 
 Manage permisions on custom resources in a hierarchical way.
 

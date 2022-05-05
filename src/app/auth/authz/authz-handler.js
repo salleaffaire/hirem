@@ -2,18 +2,31 @@
 
 // const { UnauthorizedError } = require('express-jwt')
 
-const authorizationHandler = (resource, action, filter) => (req, res, next) => {
+const AccountModel = require('../../routes/v1/accounts/account-model')
+const AccountController = require('../../routes/v1/accounts/controller')(AccountModel)
+
+// function sleep (ms) {
+//   return new Promise((resolve) => {
+//     setTimeout(resolve, ms)
+//   })
+// }
+
+const authorizationHandler = (resource, action) => async (req, res, next) => {
   console.log('authorizationHandler Called')
-  const permissions = req.permissions.permissions
-  console.log({ permissions })
+  console.log('User\'s full permissions')
+  const permissionsObject = req.permissions
+  const permissions = permissionsObject.permissions
+  console.log(permissionsObject)
 
   const filteredPermissions = permissions.filter(e => e.resource === resource && e.action === action)
 
   if (filteredPermissions.length !== 0) {
     // Here we have found the right resource
     // We then let the call go and setup the `req.filter` field depending on the scope
+    console.log('User\'s necessary permissions to perform the operation')
     console.log({ filteredPermissions })
     const scope = filteredPermissions[0].scope
+    const level = filteredPermissions[0].level
 
     switch (scope) {
       case '*':
@@ -21,11 +34,13 @@ const authorizationHandler = (resource, action, filter) => (req, res, next) => {
         next()
         break
       case '@':
-        req.belongsToFilter = [req.account.id]
+        req.belongsToFilter = [req.permissions.accountId]
         next()
         break
       case '#':
-        req.belongsToFilter = [req.account.id]
+        req.belongsToFilter = await AccountController.childrenAccounts(req.permissions.accountId, level)
+        console.log('req.belongsToFilter')
+        console.log(req.belongsToFilter)
         next()
         break
       default:

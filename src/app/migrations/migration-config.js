@@ -1,4 +1,8 @@
+const config = require('../config')
+
 module.exports = {
-  MainAccountId: 'c68fc448-aafb-4eac-8c6d-4f7ac02de417',
-  knexUserId: 'knex-migration'
+  knexUserId: 'knex-migration',
+  superAccountId: config.auth.superUserAccount,
+  superUserId: config.auth.superUserId,
+  superUserName: config.auth.superUserName
 }

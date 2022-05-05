@@ -11,16 +11,16 @@ const getUserName = () => {
   return user.userName
 }
 
-const getAccountName = () => {
-  let account = requestContext.get('account')
-  if (!account) {
+const getAccountId = () => {
+  let permissions = requestContext.get('permissions')
+  if (!permissions) {
     logger.warn('No account found in request context')
-    account = {}
+    permissions = {}
   }
-  return account.id
+  return permissions.accountId
 }
 
 module.exports = {
-  getAccountName,
+  getAccountId,
   getUserName
 }

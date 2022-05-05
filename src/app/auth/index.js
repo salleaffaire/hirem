@@ -14,18 +14,32 @@ const passThroughAuthHandler = (req, res, next) => {
   // Fake AuthN/AuthZ
   setHttpContext(req,
     { userName: authConfig.testUserName, id: authConfig.testUserId }, // User
-    { name: authConfig.testAccountName, id: authConfig.testAccountId }, // Account
-    {
-      permissions: [ // Permissions
+    { // Permissions
+      accountId: authConfig.testAccountId,
+      permissions: [
         {
           resource: 'hirem.accounts',
           action: 'r',
-          scope: '@'
+          scope: '#',
+          level: 1
         },
         {
           resource: 'hirem.accounts',
           action: 'w',
-          scope: '@'
+          scope: '#',
+          level: 1
+        },
+        {
+          resource: 'hirem.users',
+          action: 'r',
+          scope: '*',
+          level: 1
+        },
+        {
+          resource: 'hirem.users',
+          action: 'w',
+          scope: '*',
+          level: 1
         }
       ]
     })

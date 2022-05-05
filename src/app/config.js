@@ -1,7 +1,5 @@
 'use strict'
 
-const testAccountId = require('./migrations/migration-config').MainAccountId
-
 const config = module.exports
 
 config.express = {
@@ -41,16 +39,22 @@ config.logger = {
   }
 }
 
+const superUserId = 'a423531d-3661-4a3d-8b3a-ce4e81747033'
+const superUserAccount = 'c68fc448-aafb-4eac-8c6d-4f7ac02de417'
+
 config.auth = {
   enabled: !process.env.AUTH_DISABLED,
   audience: process.env.AUTH_AUDIENCE || '',
   issuer: process.env.AUTH_ISSUER || 'acme.auth0.com',
 
-  testUserName: process.env.AUTH_TEST_USER_NAME || 'test.user@acme.com',
+  superUserName: process.env.AUTH_SUPER_USER_NAME || 'super.user@acme.com',
+  superUserId: process.env.AUTH_SUPER_USER_ID || superUserId,
+  superUserAccount: process.env.AUTH_SUPER_USER_ACCOUNT || superUserAccount,
+
+  testUserName: process.env.AUTH_TEST_USER_NAME || 'super.user@acme.com',
   testUserId: process.env.AUTH_TEST_USER_ID || 'f405d0b1-9577-4f41-b6d6-6e4d88e68db7',
   testAccountName: process.env.AUTH_TEST_ACCOUNT_NAME || 'Test Account',
-  testAccountId: process.env.AUTH_TEST_ACCOUNT_ID || testAccountId
-
+  testAccountId: process.env.AUTH_TEST_ACCOUNT_ID || superUserAccount
 }
 
 config.oauth = {

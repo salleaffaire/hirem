@@ -5,8 +5,7 @@ const log = require('../../../logger')
 
 const accountCreateSchema = Joi.object({
   name: Joi.string().required().max(64),
-  active: Joi.boolean().strict(),
-  parentAccountId: Joi.string().uuid({ version: 'uuidv4' })
+  active: Joi.boolean().strict()
 }).required()
 
 const createAccountUserSchema = Joi.object({
@@ -17,6 +16,8 @@ const createAccountUserSchema = Joi.object({
 const updateAccountUserSchema = Joi.object({
   active: Joi.boolean().strict().required()
 })
+
+const uuidv4Schema = Joi.string().uuid({ version: 'uuidv4' })
 
 const validate = function (schema, data) {
   const { error } = schema.validate(data)
@@ -32,6 +33,7 @@ module.exports = {
   accountCreateSchema,
   createAccountUserSchema,
   updateAccountUserSchema,
+  uuidv4Schema,
 
   validate
 }

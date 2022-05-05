@@ -6,13 +6,15 @@ const config = require('../migration-config')
  */
 exports.up = function (knex) {
   return knex('accounts').insert([{
-    id: config.MainAccountId,
-    name: 'Main Account',
-    belongsTo: config.MainAccountId,
+    id: config.superAccountId,
+    name: 'Super Account',
+    belongsTo: config.superAccountId,
     createdBy: config.knexUserId
-  }, {
+  },
+  // What is below is just for testing (will be deleted)
+  {
     id: '723e7a68-78bf-466a-96f0-d67fcc7a187a',
-    name: 'Secondary Account',
+    name: 'Secondary Super Account',
     belongsTo: '723e7a68-78bf-466a-96f0-d67fcc7a187a',
     createdBy: config.knexUserId
   }]

@@ -1,30 +1,48 @@
 'use strict'
 
+const { uuidv4Schema, accountCreateSchema } = require('../utils/validation')
+
 const logger = require('../../../logger').child({ component: 'accounts-controller' })
-const accountCreateSchema = require('../utils/validation').accountCreateSchema
+// const  accountCreateSchema = require('../utils/validation').accountCreateSchema
 const validator = require('../utils/validation').validate
 
 module.exports = AccountModel => {
+  // This function should return the ids of the parents for each level
+  // For example,
+  // Level 0: returns the id of the current account, which is the account id itself.
+  //
+
   const childrenAccounts = async (id, level) => {
+    console.log(`ID: ${id}`)
     let accountListLevel = [id]
-    const accountList = []
-    while (level >= 0) {
-      // console.log(`level ${level} : ${id}`)
+
+    let currentLevel = 0
+    if (level === 0) {
+      return accountListLevel
+    }
+
+    const accountList = [{ id }]
+    while (currentLevel < level) {
+      console.log(`Finding children of level ${currentLevel} : ${id}`)
 
       const accountForLevel = []
       for (let i = 0; i < accountListLevel.length; i++) {
         const accounts = await AccountModel.findByBelongsTo(accountListLevel[i])
-        // console.log({ accounts })
+        console.log({ accounts })
         // Push in the current level list
         accountForLevel.push(...accounts)
         // Push in the big list
         accountList.push(...accounts)
       }
       accountListLevel = accountForLevel.map(e => { return e.id }).filter(e => e !== id)
+      console.log({ accountListLevel })
 
-      level = level - 1
+      currentLevel = currentLevel + 1
     }
-    console.log({ accountList })
+
+    console.log()
+
+    return accountList.map(e => { return e.id })
   }
 
   /* Return all accounts user has permissions to access */
@@ -59,11 +77,15 @@ module.exports = AccountModel => {
   const createAccount = async (req, res, next) => {
     logger.info('Received post request for account ', req.body)
 
+    const overrideBelongsTo = req.query.overrideBelongsTo
+    const resultQuery = validator(uuidv4Schema, overrideBelongsTo)
     const { name, active } = req.body
-    const result = validator(accountCreateSchema, req.body)
+    const resultBody = validator(accountCreateSchema, req.body)
 
-    if (result) {
-      res.status(400).json({ error: result })
+    if (resultQuery) {
+      res.status(400).json({ error: resultQuery })
+    } else if (resultBody) {
+      res.status(400).json({ error: resultBody })
     } else {
       try {
         const account = await AccountModel.findByName(name)
@@ -72,10 +94,11 @@ module.exports = AccountModel => {
           logger.error(message)
           res.status(409).json({ error: message })
         } else {
+          console.log({ overrideBelongsTo })
           const createdAccount = await AccountModel.insert({
             name,
             active
-          })
+          }, overrideBelongsTo)
 
           res.status(201).json(createdAccount)
         }
