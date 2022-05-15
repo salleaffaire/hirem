@@ -11,7 +11,6 @@ module.exports = AccountModel => {
   // For example,
   // Level 0: returns the id of the current account, which is the account id itself.
   //
-
   const childrenAccounts = async (id, level) => {
     console.log(`ID: ${id}`)
     let accountListLevel = [id]
@@ -95,12 +94,23 @@ module.exports = AccountModel => {
           res.status(409).json({ error: message })
         } else {
           console.log({ overrideBelongsTo })
-          const createdAccount = await AccountModel.insert({
-            name,
-            active
-          }, overrideBelongsTo)
-
-          res.status(201).json(createdAccount)
+          if (overrideBelongsTo) {
+            if (req.belongsToFilter.includes(overrideBelongsTo)) {
+              const createdAccount = await AccountModel.insert({
+                name,
+                active
+              }, overrideBelongsTo)
+              res.status(201).json(createdAccount)
+            } else {
+              res.status(403).json({ error: `no permissions to override account ${overrideBelongsTo}` })
+            }
+          } else {
+            const createdAccount = await AccountModel.insert({
+              name,
+              active
+            }, overrideBelongsTo)
+            res.status(201).json(createdAccount)
+          }
         }
       } catch (err) {
         logger.error('Error occurred while creating account ', err)

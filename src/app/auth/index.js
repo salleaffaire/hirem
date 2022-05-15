@@ -5,6 +5,8 @@ const authConfig = require('../config').auth
 const logger = require('../logger').child({ component: 'auth' })
 const setHttpContext = require('./set-http-context')
 
+const { passThroughPermissions } = require('./pass-through-authz')
+
 if (!authConfig.enabled) {
   logger.warn('Using pass-through authentication handler!')
 }
@@ -16,32 +18,7 @@ const passThroughAuthHandler = (req, res, next) => {
     { userName: authConfig.testUserName, id: authConfig.testUserId }, // User
     { // Permissions
       accountId: authConfig.testAccountId,
-      permissions: [
-        {
-          resource: 'hirem.accounts',
-          action: 'r',
-          scope: '#',
-          level: 1
-        },
-        {
-          resource: 'hirem.accounts',
-          action: 'w',
-          scope: '#',
-          level: 1
-        },
-        {
-          resource: 'hirem.users',
-          action: 'r',
-          scope: '*',
-          level: 1
-        },
-        {
-          resource: 'hirem.users',
-          action: 'w',
-          scope: '*',
-          level: 1
-        }
-      ]
+      permissions: passThroughPermissions
     })
 
   next()

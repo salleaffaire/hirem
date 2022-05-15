@@ -2,7 +2,8 @@ const express = require('express')
 const httpContext = require('express-http-context')
 const { Model } = require('objection')
 
-const Account = require('./routes/v1/accounts/account-model')
+const AccountModel = require('./routes/v1/accounts/account-model')
+const UserModel = require('./routes/v1/users/user-model')
 
 module.exports = ({ dbConnection, authHandler, errorHandler, defaultHandler }) => {
   const app = express()
@@ -23,8 +24,8 @@ module.exports = ({ dbConnection, authHandler, errorHandler, defaultHandler }) =
   // app.use(cors())
 
   // PostgreSQL backed routes
-  app.use('/api/v1/', require('./routes/v1/accounts/router')({ model: Account, authHandler }))
-  // app.use('/api/v1/', require('./routes/v1/users/router')({ model: UserModel, authHandler }))
+  app.use('/api/v1/', require('./routes/v1/accounts/router')({ model: AccountModel, authHandler }))
+  app.use('/api/v1/', require('./routes/v1/users/router')({ model: UserModel, authHandler }))
 
   // expressOasGenerator.handleRequests(app)
 

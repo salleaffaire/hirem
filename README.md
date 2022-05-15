@@ -6,6 +6,10 @@ Manage permisions on custom resources in a hierarchical way.
 
 Users in Account ACME have READ and WRITE access on Pizza resources as never been easier to implement, manage and enforce.
 
+## Docs
+
+Hierarchical Resource Language [HRL](./docs/language.md)
+
 ## Start postgres for development
 
 ### Docker
@@ -51,3 +55,41 @@ eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
 ```
 
 `172.23.13.2` in this example
+
+### Launch
+
+Install for development,
+
+```bash
+npm install
+```
+
+Start the service,
+
+```bash
+npm start
+```
+
+Start the service with Auth disabled,
+
+```bash
+AUTH_DISABLED="1" npm start
+```
+
+## API
+
+```rest
+GET     /accounts
+GET     /accounts/{accountId}
+POST    /accounts
+
+GET     /users
+GET     /accounts/{accountId}/users
+GET     /accounts/{accountId}/users/{userId}
+POST    /accounts/{accountId}/users
+```
+
+## Misc
+
+1- @ is equivalent to #(0)
+2-

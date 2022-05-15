@@ -16,8 +16,7 @@ module.exports = {
       query.whereIn('belongsTo', accountsFilter)
     }
     return query
-  },
-  findCreatedByAccount: (accountId) => Account.query().debug().where('status', null).where('parentAccountId', accountId),
-  findCreatedByUser: ({ userName }) => Account.query().debug().where('status', null).where('createdBy', userName),
-  findByIds: (accountIdList) => Account.query().debug().where('status', null).whereIn('id', accountIdList)
+  }
+  // findCreatedByUser: ({ userName }) => Account.query().debug().where('status', null).where('createdBy', userName),
+  // findByIds: (accountIdList) => Account.query().debug().where('status', null).whereIn('id', accountIdList)
 }
