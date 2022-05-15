@@ -1,4 +1,4 @@
-# hirem
+# hirem (WiP this project is not completed)
 
 HIerarchical REsource Manager
 
