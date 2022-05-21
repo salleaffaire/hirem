@@ -24,6 +24,16 @@ const passThroughAuthHandler = (req, res, next) => {
   next()
 }
 
+const accountInScope = (accountId, scopeList) => {
+  if (scopeList !== undefined) {
+    // If the accountId is not in the belongsToFilter
+    if (!scopeList.find(e => e === accountId)) {
+      return false
+    }
+  }
+  return true
+}
+
 module.exports = {
   /*
   * requestHandler returns a chain of expressJS middlewares, so order is VERY important
@@ -36,5 +46,7 @@ module.exports = {
   /*
   * "Global" error handler for Authentication/Authorization related errors
   */
-  errorHandler
+  errorHandler,
+
+  accountInScope
 }

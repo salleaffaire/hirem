@@ -1,5 +1,7 @@
 # HiReM API
 
+<img src="fullExchange/.svg">
+
 ## Accounts
 
 ```curl

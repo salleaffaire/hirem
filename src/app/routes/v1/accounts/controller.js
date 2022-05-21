@@ -47,7 +47,7 @@ module.exports = AccountModel => {
   /* Return all accounts user has permissions to access */
   const listAccounts = async (req, res, next) => {
     try {
-      const accountList = await AccountModel.findAll(req.belongsToFilter)
+      const accountList = await AccountModel.findAll(req.scopeList)
 
       res.json(accountList)
     } catch (err) {
@@ -62,11 +62,11 @@ module.exports = AccountModel => {
 
     // If there is a belongsTo filter, make sure that the user scope
     // permits reading the target account
-    console.log(req.belongsToFilter)
-    req.belongsToFilter.find((e) => e === accountId)
-    if (req.belongsToFilter !== undefined) {
-      // If the accountId is not in the belongsToFilter
-      if (!req.belongsToFilter.find(e => e === accountId)) {
+    console.log(req.scopeList)
+    req.scopeList.find((e) => e === accountId)
+    if (req.scopeList !== undefined) {
+      // If the accountId is not in the scopeList
+      if (!req.scopeList.find(e => e === accountId)) {
         logger.error(`User unauthorized in account ${accountId}`)
         return res.status(403).json({ error: 'Unauthorized' })
       }
@@ -107,7 +107,7 @@ module.exports = AccountModel => {
         } else {
           console.log({ overrideBelongsTo })
           if (overrideBelongsTo) {
-            if (req.belongsToFilter.includes(overrideBelongsTo)) {
+            if (req.scopeList.includes(overrideBelongsTo)) {
               const createdAccount = await AccountModel.insert({
                 name,
                 active

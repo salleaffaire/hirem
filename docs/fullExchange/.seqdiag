@@ -1,0 +1,9 @@
+Title: Full AuthZ Exchange
+User->Web Service: User request Web page
+Web Service-->User: Web page (HTML/CSS/JS)
+User->IDP: User redirected to IDP
+User->IDP: User enters credentials (email@acme.com/PW + 2FA)
+IDP->HiReM: GET /userinfo?user=email@acme.com
+HiReM-->IDP: User Permission Object
+IDP-->User: Signed Token
+

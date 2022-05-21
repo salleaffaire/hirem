@@ -30,17 +30,17 @@ const authorizationHandler = (resource, action) => async (req, res, next) => {
 
     switch (scope) {
       case '*':
-        req.belongsToFilter = undefined
+        req.scopeList = undefined
         next()
         break
       case '@':
-        req.belongsToFilter = [req.permissions.accountId]
+        req.scopeList = [req.permissions.accountId]
         next()
         break
       case '#':
-        req.belongsToFilter = await AccountController.childrenAccounts(req.permissions.accountId, level)
-        console.log('req.belongsToFilter')
-        console.log(req.belongsToFilter)
+        req.scopeList = await AccountController.childrenAccounts(req.permissions.accountId, level)
+        console.log('req.scopeList')
+        console.log(req.scopeList)
         next()
         break
       default:

@@ -9,7 +9,7 @@ module.exports = UserModel => {
   /* Return all accounts user has permissions to access */
   const listUsers = async (req, res, next) => {
     try {
-      const userList = await UserModel.findAll(req.belongsToFilter)
+      const userList = await UserModel.findAll(req.scopeList)
 
       res.json(userList)
     } catch (err) {
@@ -24,11 +24,11 @@ module.exports = UserModel => {
 
     // If there is a belongsTo filter, make sure that the user scope
     // permits reading the target account
-    console.log(req.belongsToFilter)
-    req.belongsToFilter.find((e) => e === accountId)
-    if (req.belongsToFilter !== undefined) {
-      // If the accountId is not in the belongsToFilter
-      if (!req.belongsToFilter.find(e => e === accountId)) {
+    console.log(req.scopeList)
+    req.scopeList.find((e) => e === accountId)
+    if (req.scopeList !== undefined) {
+      // If the accountId is not in the scopeList
+      if (!req.scopeList.find(e => e === accountId)) {
         logger.error(`User unauthorized in account ${accountId}`)
         return res.status(403).json({ error: 'Unauthorized' })
       }
@@ -50,9 +50,9 @@ module.exports = UserModel => {
 
     // If there is a belongsTo filter, make sure that the user scope
     // permits modifying the target account
-    if (req.belongsToFilter !== undefined) {
-      // If the accountId is not in the belongsToFilter
-      if (!req.belongsToFilter.find(e => e === accountId)) {
+    if (req.scopeList !== undefined) {
+      // If the accountId is not in the scopeList
+      if (!req.scopeList.find(e => e === accountId)) {
         logger.error(`User unauthorized in account ${accountId}`)
         return res.status(403).json({ error: 'Unauthorized' })
       }
@@ -89,9 +89,9 @@ module.exports = UserModel => {
 
     // If there is a belongsTo filter, make sure that the user scope
     // permits modifying the target account
-    if (req.belongsToFilter !== undefined) {
-      // If the accountId is not in the belongsToFilter
-      if (!req.belongsToFilter.find(e => e === accountId)) {
+    if (req.scopeList !== undefined) {
+      // If the accountId is not in the scopeList
+      if (!req.scopeList.find(e => e === accountId)) {
         logger.error(`User unauthorized in account ${accountId}`)
         return res.status(403).json({ error: 'Unauthorized' })
       }
