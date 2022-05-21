@@ -8,8 +8,10 @@ module.exports = ({ model, authHandler }) => {
   router.param('userId', userValidator)
 
   router.get('/users', authHandler(authorizationHandler('hirem.users', 'r')), controller.listUsers)
-  // router.get('/accounts/:accountId/users', authHandler(authorizationHandler('hirem.users', 'r')), controller.listUsers)
-  // router.get('/accounts/:accountId/users/:userId', authHandler(authorizationHandler('hirem.users', 'w')), controller.getUser)
+  router.get('/accounts/:accountId/users', authHandler(authorizationHandler('hirem.users', 'r')), controller.listAccountUsers)
+  router.get('/accounts/:accountId/users/:userId', authHandler(authorizationHandler('hirem.users', 'r')), controller.getUser)
+
+  router.post('/accounts/:accountId/users', authHandler(authorizationHandler('hirem.users', 'w')), controller.createUser)
 
   return router
 }

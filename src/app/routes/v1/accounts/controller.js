@@ -60,6 +60,18 @@ module.exports = AccountModel => {
     logger.info('Received get request for account ', req.params)
     const { accountId } = req.params
 
+    // If there is a belongsTo filter, make sure that the user scope
+    // permits reading the target account
+    console.log(req.belongsToFilter)
+    req.belongsToFilter.find((e) => e === accountId)
+    if (req.belongsToFilter !== undefined) {
+      // If the accountId is not in the belongsToFilter
+      if (!req.belongsToFilter.find(e => e === accountId)) {
+        logger.error(`User unauthorized in account ${accountId}`)
+        return res.status(403).json({ error: 'Unauthorized' })
+      }
+    }
+
     try {
       const account = await AccountModel.findById(accountId)
       if (account.active) {

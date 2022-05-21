@@ -5,25 +5,25 @@ module.exports = {
     {
       resource: 'hirem.accounts',
       action: 'r',
-      scope: '#',
+      scope: '@',
       level: 0
     },
     {
       resource: 'hirem.accounts',
       action: 'w',
-      scope: '#',
+      scope: '@',
       level: 0
     },
     {
       resource: 'hirem.users',
       action: 'r',
-      scope: '*',
+      scope: '@',
       level: 1
     },
     {
       resource: 'hirem.users',
       action: 'w',
-      scope: '*',
+      scope: '@',
       level: 1
     }
   ]

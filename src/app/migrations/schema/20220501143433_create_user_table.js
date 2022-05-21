@@ -6,7 +6,7 @@ exports.up = function (knex) {
   return knex.schema
     .createTable('users', table => {
       table.uuid('id').primary()
-      table.string('user_name').notNullable()
+      table.string('name').notNullable()
       table.string('full_name')
       table.boolean('active').defaultTo(true)
       table.timestamp('created_at', { useTz: false }).defaultTo(knex.fn.now())

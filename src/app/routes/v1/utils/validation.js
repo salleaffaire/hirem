@@ -9,7 +9,7 @@ const accountCreateSchema = Joi.object({
 }).required()
 
 const createAccountUserSchema = Joi.object({
-  userName: Joi.string().required().max(64),
+  name: Joi.string().required().max(64),
   fullName: Joi.string().required()
 })
 

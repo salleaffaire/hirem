@@ -1,7 +1,7 @@
 const config = require('../migration-config')
 
 const superAdmins = [
-  { id: config.superUserId, userName: config.superUserName }
+  { id: config.superUserId, name: config.superUserName }
 ]
 
 /**
