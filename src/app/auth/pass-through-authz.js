@@ -25,6 +25,30 @@ module.exports = {
       action: 'w',
       scope: '@',
       level: 1
+    },
+    {
+      resource: 'hirem.roles',
+      action: 'r',
+      scope: '@',
+      level: 1
+    },
+    {
+      resource: 'hirem.roles',
+      action: 'w',
+      scope: '@',
+      level: 1
+    },
+    {
+      resource: 'hirem.permissions',
+      action: 'r',
+      scope: '@',
+      level: 1
+    },
+    {
+      resource: 'hirem.permissions',
+      action: 'w',
+      scope: '@',
+      level: 1
     }
   ]
 }

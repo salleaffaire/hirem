@@ -9,6 +9,7 @@ module.exports = (Model) => ({
   model: Model,
   insert: (insertData, overrideBelongsTo) => Model.query().debug().insertAndFetch(
     { belongsTo: overrideBelongsTo || getAccountId(), createdBy: getUserName(), ...insertData }),
+  relate: (forId, relateId, queryName) => Model.relatedQuery(queryName).debug().for(forId).relate(relateId),
   findById: (id) => Model.query().debug().findOne({ id, status: null }),
   findByBelongsTo: (belongsTo) => Model.query().debug().where({ belongsTo, status: null }),
   findByIdBelongsTo: (id, belongsTo) => Model.query().debug().findOne({ id, belongsTo }),

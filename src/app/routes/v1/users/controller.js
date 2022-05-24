@@ -5,6 +5,8 @@ const { uuidv4Schema, createAccountUserSchema } = require('../utils/validation')
 const logger = require('../../../logger').child({ component: 'user-controller' })
 const validator = require('../utils/validation').validate
 
+const { accountInScope } = require('../../../auth')
+
 module.exports = UserModel => {
   /* Return all accounts user has permissions to access */
   const listUsers = async (req, res, next) => {
@@ -24,14 +26,9 @@ module.exports = UserModel => {
 
     // If there is a belongsTo filter, make sure that the user scope
     // permits reading the target account
-    console.log(req.scopeList)
-    req.scopeList.find((e) => e === accountId)
-    if (req.scopeList !== undefined) {
-      // If the accountId is not in the scopeList
-      if (!req.scopeList.find(e => e === accountId)) {
-        logger.error(`User unauthorized in account ${accountId}`)
-        return res.status(403).json({ error: 'Unauthorized' })
-      }
+    if (!accountInScope(accountId, req.scopeList)) {
+      logger.error(`User unauthorized in account ${accountId}`)
+      return res.status(403).json({ error: 'Unauthorized' })
     }
 
     try {
@@ -39,7 +36,50 @@ module.exports = UserModel => {
       console.log({ users })
       return res.status(200).json(users)
     } catch (err) {
-      logger.error('Error occurred while getting account ', err)
+      logger.error('Error occurred while getting users ', err)
+      return res.status(500).json({ error: 'Unknown error' })
+    }
+  }
+
+  const listAccountUserRoles = async (req, res, next) => {
+    logger.info('Received get request for account user roles', req.params)
+    const { accountId, userId } = req.params
+
+    // If there is a belongsTo filter, make sure that the user scope
+    // permits reading the target account
+    if (!accountInScope(accountId, req.scopeList)) {
+      logger.error(`User unauthorized in account ${accountId}`)
+      return res.status(403).json({ error: 'Unauthorized' })
+    }
+
+    try {
+      const roles = await UserModel.findRolesByAccountIdUserId(accountId, userId)
+      console.log({ roles })
+      return res.status(200).json(roles)
+    } catch (err) {
+      logger.error('Error occurred while getting users ', err)
+      return res.status(500).json({ error: 'Unknown error' })
+    }
+  }
+
+  const addAccountUserRole = async (req, res, next) => {
+    logger.info('Received post request for account user roles', req.params)
+    const { accountId, userId, roleId } = req.params
+
+    // If there is a belongsTo filter, make sure that the user scope
+    // permits reading the target account
+    if (!accountInScope(accountId, req.scopeList)) {
+      logger.error(`User unauthorized in account ${accountId}`)
+      return res.status(403).json({ error: 'Unauthorized' })
+    }
+
+    try {
+      const roles = await UserModel.relate(userId, roleId, 'roles')
+      console.log('Am I here ?')
+      console.log({ roles })
+      return res.status(201).json(roles)
+    } catch (err) {
+      logger.error('Error occurred while assigning role to user ', err)
       return res.status(500).json({ error: 'Unknown error' })
     }
   }
@@ -75,13 +115,9 @@ module.exports = UserModel => {
   const createUser = async (req, res, next) => {
     logger.info('Received post request for user ', req.body)
 
-    let { accountId } = req.params
+    const { accountId } = req.params
 
-    // Get override belongsTo, validate and replace accountId if present
-    const overrideBelongsTo = req.query.overrideBelongsTo
-    const resultQuery = validator(uuidv4Schema, overrideBelongsTo)
-
-    accountId = overrideBelongsTo || accountId
+    const resultQuery = validator(uuidv4Schema, accountId)
 
     // Extract data from body and validate
     const { name, fullName, active } = req.body
@@ -109,12 +145,11 @@ module.exports = UserModel => {
           logger.error(message)
           res.status(409).json({ error: message })
         } else {
-          console.log({ overrideBelongsTo })
           const createdUser = await UserModel.insert({
             name,
             fullName,
             active
-          }, overrideBelongsTo)
+          }, accountId)
 
           res.status(201).json(createdUser)
         }
@@ -130,6 +165,8 @@ module.exports = UserModel => {
     listUsers,
     getUser,
     listAccountUsers,
+    listAccountUserRoles,
+    addAccountUserRole,
     createUser
   }
 }

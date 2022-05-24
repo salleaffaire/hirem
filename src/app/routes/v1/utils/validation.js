@@ -17,6 +17,13 @@ const updateAccountUserSchema = Joi.object({
   active: Joi.boolean().strict().required()
 })
 
+const createAccountRolePermissionSchema = Joi.object({
+  resourceType: Joi.string().required().max(64),
+  action: Joi.string().required().max(1).valid('r', 'w').insensitive(),
+  scope: Joi.string().required().max(1).valid('@', '*', '+').insensitive(),
+  level: Joi.number().required()
+})
+
 const uuidv4Schema = Joi.string().uuid({ version: 'uuidv4' })
 
 const validate = function (schema, data) {
@@ -33,6 +40,7 @@ module.exports = {
   accountCreateSchema,
   createAccountUserSchema,
   updateAccountUserSchema,
+  createAccountRolePermissionSchema,
   uuidv4Schema,
 
   validate

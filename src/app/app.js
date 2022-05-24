@@ -4,6 +4,8 @@ const { Model } = require('objection')
 
 const AccountModel = require('./routes/v1/accounts/account-model')
 const UserModel = require('./routes/v1/users/user-model')
+const PermissionModel = require('./routes/v1/permissions/permission-model')
+const RoleModel = require('./routes/v1/roles/role-model')
 
 module.exports = ({ dbConnection, authHandler, errorHandler, defaultHandler }) => {
   const app = express()
@@ -26,6 +28,8 @@ module.exports = ({ dbConnection, authHandler, errorHandler, defaultHandler }) =
   // PostgreSQL backed routes
   app.use('/api/v1/', require('./routes/v1/accounts/router')({ model: AccountModel, authHandler }))
   app.use('/api/v1/', require('./routes/v1/users/router')({ model: UserModel, authHandler }))
+  app.use('/api/v1/', require('./routes/v1/permissions/router')({ model: PermissionModel, authHandler }))
+  app.use('/api/v1/', require('./routes/v1/roles/router')({ model: RoleModel, authHandler }))
 
   // expressOasGenerator.handleRequests(app)
 

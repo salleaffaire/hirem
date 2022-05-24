@@ -4,13 +4,10 @@
  */
 exports.up = function (knex) {
   return knex.schema
-    .createTable('permissions', table => {
+    .createTable('roles', table => {
       table.uuid('id').primary()
+      table.string('name').notNullable()
       table.string('status')
-      table.string('resource_type')
-      table.string('action')
-      table.string('scope')
-      table.integer('level')
       // belongsTo is used as the parent/child relationship for accounts
       table.uuid('belongs_to').notNullable()
       table.foreign('belongs_to').references('accounts.id')
@@ -28,5 +25,5 @@ exports.up = function (knex) {
  */
 exports.down = function (knex) {
   return knex.schema
-    .dropTableIfExists('permissions')
+    .dropTableIfExists('roles')
 }
