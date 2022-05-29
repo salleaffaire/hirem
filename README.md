@@ -8,8 +8,8 @@ Users in Account ACME have READ and WRITE access on Pizza resources as never bee
 
 ## Docs
 
-Hierarchical Resource Language [HRL](./docs/language.md)
-API [API](./docs/api.md)
+- Hierarchical Resource Language ([HRL](./docs/language.md))
+- [API](./docs/api.md)
 
 ## Start postgres for development
 
@@ -83,6 +83,7 @@ AUTH_DISABLED="1" npm start
   x GET     /accounts
   x GET     /accounts/{accountId}
   x POST    /accounts
+  x POST    /accounts/{accountId}
 
   x GET     /users
   x GET     /accounts/{accountId}/users
