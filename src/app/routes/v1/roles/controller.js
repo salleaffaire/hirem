@@ -5,7 +5,7 @@
 const logger = require('../../../logger').child({ component: 'role-controller' })
 // const validator = require('../utils/validation').validate
 
-// const { accountInScope } = require('../../../auth')
+const { accountInScope } = require('../../../auth')
 
 module.exports = RoleModel => {
   /* Return all accounts user has permissions to access */
@@ -20,9 +20,33 @@ module.exports = RoleModel => {
     }
   }
 
-  // const listAccountUsers = async (req, res, next) => {
-  //   logger.info('Received get request for user ', req.params)
-  //   const { accountId } = req.params
+  const listAccountRoles = async (req, res, next) => {
+    logger.info('Received get request for roles ', req.params)
+    const { accountId } = req.params
+
+    // If there is a belongsTo filter, make sure that the user scope
+    // permits reading the target account
+    if (!accountInScope(accountId, req.scopeList)) {
+      logger.error(`User unauthorized in account ${accountId}`)
+      return res.status(403).json({ error: 'Unauthorized' })
+    }
+
+    try {
+      const roles = await RoleModel.findByBelongsTo(accountId)
+      console.log({ roles })
+      return res.status(200).json(roles)
+    } catch (err) {
+      logger.error('Error occurred while getting roles ', err)
+      return res.status(500).json({ error: 'Unknown error' })
+    }
+  }
+
+  // // -------------------------------------------------------------------------------
+  // // ROLE BIDING (Link a role to a user)
+  // // -------------------------------------------------------------------------------
+  // const addAccountUserRole = async (req, res, next) => {
+  //   logger.info('Received post request for account user roles', req.params)
+  //   const { accountId, userId, roleId } = req.params
 
   //   // If there is a belongsTo filter, make sure that the user scope
   //   // permits reading the target account
@@ -31,19 +55,33 @@ module.exports = RoleModel => {
   //     return res.status(403).json({ error: 'Unauthorized' })
   //   }
 
+  //   // Test that userId is in accountId
+  //   const user = await UserModel.findByIdBelongsTo(userId, accountId)
+  //   if (!user) {
+  //     logger.error(`User ${userId} is not in account ${accountId}`)
+  //     return res.status(412).json({ error: `User ${userId} is not in account ${accountId}` })
+  //   }
+
+  //   // Test that roleId is in accountId
+
+  //   // Test that userId has the permission to bind roleId
+
   //   try {
-  //     const users = await UserModel.findByBelongsTo(accountId)
-  //     console.log({ users })
-  //     return res.status(200).json(users)
+  //     const roles = await UserModel.relate(userId, roleId, 'roles')
+  //     return res.status(201).json(roles)
   //   } catch (err) {
-  //     logger.error('Error occurred while getting users ', err)
+  //     logger.error('Error occurred while assigning role to user ', err)
   //     return res.status(500).json({ error: 'Unknown error' })
   //   }
   // }
+  // // -------------------------------------------------------------------------------
 
-  // const listAccountUserRoles = async (req, res, next) => {
-  //   logger.info('Received get request for user roles', req.params)
-  //   const { accountId, userId } = req.params
+  // // -------------------------------------------------------------------------------
+  // // ROLE UN-BIDING (Link a role to a user)
+  // // -------------------------------------------------------------------------------
+  // const deleteAccountUserRole = async (req, res, next) => {
+  //   logger.info('Received delete request for account user roles', req.params)
+  //   const { accountId, userId, roleId } = req.params
 
   //   // If there is a belongsTo filter, make sure that the user scope
   //   // permits reading the target account
@@ -52,54 +90,60 @@ module.exports = RoleModel => {
   //     return res.status(403).json({ error: 'Unauthorized' })
   //   }
 
+  //   // Test that userId is in accountId
+  //   const user = await UserModel.findByIdBelongsTo(userId, accountId)
+  //   if (!user) {
+  //     logger.error(`User ${userId} is not in account ${accountId}`)
+  //     return res.status(412).json({ error: `User ${userId} is not in account ${accountId}` })
+  //   }
+
+  //   // Test that roleId is in accountId
+
+  //   // Test that userId has the permission to bind roleId
+
   //   try {
-  //     const roles = await UserModel.findRolesByAccountIdUserId(accountId, userId)
-  //     console.log({ roles })
-  //     return res.status(200).json(roles)
+  //     const roles = await UserModel.unrelate(userId, roleId, 'roles', 'roleId')
+  //     return res.status(201).json(roles)
   //   } catch (err) {
-  //     logger.error('Error occurred while getting users ', err)
+  //     logger.error('Error occurred while deleting role from user ', err)
   //     return res.status(500).json({ error: 'Unknown error' })
   //   }
   // }
+  // // -------------------------------------------------------------------------------
 
-  // const getUser = async (req, res, next) => {
-  //   logger.info('Received get request for user ', req.params)
-  //   const { accountId, userId } = req.params
+  const getRole = async (req, res, next) => {
+    logger.info('Received get request for user ', req.params)
+    const { accountId, roleId } = req.params
 
-  //   // If there is a belongsTo filter, make sure that the user scope
-  //   // permits modifying the target account
-  //   if (req.scopeList !== undefined) {
-  //     // If the accountId is not in the scopeList
-  //     if (!req.scopeList.find(e => e === accountId)) {
-  //       logger.error(`User unauthorized in account ${accountId}`)
-  //       return res.status(403).json({ error: 'Unauthorized' })
-  //     }
-  //   }
+    // If there is a belongsTo filter, make sure that the user scope
+    // permits modifying the target account
+    if (req.scopeList !== undefined) {
+      // If the accountId is not in the scopeList
+      if (!req.scopeList.find(e => e === accountId)) {
+        logger.error(`User unauthorized in account ${accountId}`)
+        return res.status(403).json({ error: 'Unauthorized' })
+      }
+    }
 
-  //   try {
-  //     const user = await UserModel.findByIdBelongsTo(userId, accountId)
-  //     console.log({ user })
-  //     if (user.active) {
-  //       return res.status(200).json(user)
-  //     } else {
-  //       return res.status(404).json({ error: 'No active user found' })
-  //     }
-  //   } catch (err) {
-  //     logger.error('Error occurred while getting user ', err)
-  //     return res.status(500).json({ error: 'Unknown error' })
-  //   }
-  // }
+    try {
+      const role = await RoleModel.findByIdBelongsTo(roleId, accountId)
+      if (role.active) {
+        return res.status(200).json(role)
+      } else {
+        return res.status(404).json({ error: 'No active role found' })
+      }
+    } catch (err) {
+      logger.error('Error occurred while getting role ', err)
+      return res.status(500).json({ error: 'Unknown error' })
+    }
+  }
 
   // const createUser = async (req, res, next) => {
   //   logger.info('Received post request for user ', req.body)
 
-  //   let { accountId } = req.params
+  //   const { accountId } = req.params
 
-  //   // Get override belongsTo, validate and replace accountId if present
-  //   const overrideBelongsTo = req.query.overrideBelongsTo
-  //   const resultQuery = validator(uuidv4Schema, overrideBelongsTo)
-
-  //   accountId = overrideBelongsTo || accountId
+  //   const resultQuery = validator(uuidv4Schema, accountId)
 
   //   // Extract data from body and validate
   //   const { name, fullName, active } = req.body
@@ -121,18 +165,17 @@ module.exports = RoleModel => {
   //     res.status(400).json({ error: resultBody })
   //   } else {
   //     try {
-  //       const user = await UserModel.findByName(name)
+  //       const user = await UserModel.findByNameBelongsTo(name, accountId)
   //       if (user) {
   //         const message = `User with name ${name} already exists in account ${accountId}`
   //         logger.error(message)
   //         res.status(409).json({ error: message })
   //       } else {
-  //         console.log({ overrideBelongsTo })
   //         const createdUser = await UserModel.insert({
   //           name,
   //           fullName,
   //           active
-  //         }, overrideBelongsTo)
+  //         }, accountId)
 
   //         res.status(201).json(createdUser)
   //       }
@@ -145,9 +188,9 @@ module.exports = RoleModel => {
   // }
 
   return {
-    listRoles
-    // getUser,
-    // listAccountUsers,
+    listRoles,
+    getRole,
+    listAccountRoles
     // listAccountUserRoles,
     // createUser
   }

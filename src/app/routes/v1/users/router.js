@@ -19,5 +19,7 @@ module.exports = ({ model, authHandler }) => {
   router.post('/accounts/:accountId/users', authHandler(authorizationHandler('hirem.users', 'w')), controller.createUser)
   router.post('/accounts/:accountId/users/:userId/roles/:roleId', authHandler(authorizationHandler('hirem.users', 'w')), controller.addAccountUserRole)
 
+  router.delete('/accounts/:accountId/users/:userId/roles/:roleId', authHandler(authorizationHandler('hirem.users', 'w')), controller.deleteAccountUserRole)
+
   return router
 }

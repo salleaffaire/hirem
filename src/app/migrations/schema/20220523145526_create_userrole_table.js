@@ -14,6 +14,8 @@ exports.up = function (knex) {
       table.uuid('role_id').notNullable()
       table.foreign('role_id').references('roles.id')
 
+      table.unique(['user_id', 'role_id'])
+
       // belongsTo is used as the parent/child relationship for accounts
       // table.uuid('belongs_to').notNullable()
       // table.foreign('belongs_to').references('accounts.id')

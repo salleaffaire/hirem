@@ -5,49 +5,49 @@ module.exports = {
     {
       resource: 'hirem.accounts',
       action: 'r',
-      scope: '@',
+      scope: '*',
       level: 0
     },
     {
       resource: 'hirem.accounts',
       action: 'w',
-      scope: '@',
+      scope: '*',
       level: 0
     },
     {
       resource: 'hirem.users',
       action: 'r',
-      scope: '@',
+      scope: '*',
       level: 1
     },
     {
       resource: 'hirem.users',
       action: 'w',
-      scope: '@',
+      scope: '*',
       level: 1
     },
     {
       resource: 'hirem.roles',
       action: 'r',
-      scope: '@',
+      scope: '*',
       level: 1
     },
     {
       resource: 'hirem.roles',
       action: 'w',
-      scope: '@',
+      scope: '*',
       level: 1
     },
     {
       resource: 'hirem.permissions',
       action: 'r',
-      scope: '@',
+      scope: '*',
       level: 1
     },
     {
       resource: 'hirem.permissions',
       action: 'w',
-      scope: '@',
+      scope: '*',
       level: 1
     }
   ]

@@ -7,6 +7,7 @@ exports.up = function (knex) {
     .createTable('permissions', table => {
       table.uuid('id').primary()
       table.string('status')
+      table.boolean('active').defaultTo(true)
       table.string('resource_type')
       table.string('action')
       table.string('scope')

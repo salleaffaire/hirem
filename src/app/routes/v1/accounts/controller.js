@@ -1,10 +1,11 @@
 'use strict'
 
-const { uuidv4Schema, accountCreateSchema } = require('../utils/validation')
-
 const logger = require('../../../logger').child({ component: 'accounts-controller' })
-// const  accountCreateSchema = require('../utils/validation').accountCreateSchema
+
+const { uuidv4Schema, accountCreateSchema } = require('../utils/validation')
 const validator = require('../utils/validation').validate
+
+const { accountInScope } = require('../../../auth')
 
 module.exports = AccountModel => {
   // This function should return the ids of the parents for each level
@@ -62,14 +63,9 @@ module.exports = AccountModel => {
 
     // If there is a belongsTo filter, make sure that the user scope
     // permits reading the target account
-    console.log(req.scopeList)
-    req.scopeList.find((e) => e === accountId)
-    if (req.scopeList !== undefined) {
-      // If the accountId is not in the scopeList
-      if (!req.scopeList.find(e => e === accountId)) {
-        logger.error(`User unauthorized in account ${accountId}`)
-        return res.status(403).json({ error: 'Unauthorized' })
-      }
+    if (!accountInScope(accountId, req.scopeList)) {
+      logger.error(`User unauthorized in account ${accountId}`)
+      return res.status(403).json({ error: 'Unauthorized' })
     }
 
     try {
@@ -88,10 +84,49 @@ module.exports = AccountModel => {
   const createAccount = async (req, res, next) => {
     logger.info('Received post request for account ', req.body)
 
-    const overrideBelongsTo = req.query.overrideBelongsTo
-    const resultQuery = validator(uuidv4Schema, overrideBelongsTo)
     const { name, active } = req.body
     const resultBody = validator(accountCreateSchema, req.body)
+
+    if (resultBody) {
+      res.status(400).json({ error: resultBody })
+    } else {
+      try {
+        const account = await AccountModel.findByName(name)
+        if (account) {
+          const message = `Account with name ${name} already exists`
+          logger.error(message)
+          res.status(409).json({ error: message })
+        } else {
+          const createdAccount = await AccountModel.insert({
+            name,
+            active
+          }, undefined)
+          res.status(201).json(createdAccount)
+        }
+      } catch (err) {
+        logger.error('Error occurred while creating account ', err)
+        res.status(500).json({ error: 'Unknown error' })
+      }
+    }
+    next()
+  }
+
+  const createAccountsAccount = async (req, res, next) => {
+    logger.info('Received post request for account ', req.body)
+
+    // Validate the accountId
+    const { accountId } = req.params
+    const resultQuery = validator(uuidv4Schema, accountId)
+
+    const { name, active } = req.body
+    const resultBody = validator(accountCreateSchema, req.body)
+
+    // If there is a belongsTo filter, make sure that the user scope
+    // permits reading the target account
+    if (!accountInScope(accountId, req.scopeList)) {
+      logger.error(`User unauthorized in account ${accountId}`)
+      return res.status(403).json({ error: 'Unauthorized' })
+    }
 
     if (resultQuery) {
       res.status(400).json({ error: resultQuery })
@@ -105,24 +140,11 @@ module.exports = AccountModel => {
           logger.error(message)
           res.status(409).json({ error: message })
         } else {
-          console.log({ overrideBelongsTo })
-          if (overrideBelongsTo) {
-            if (req.scopeList.includes(overrideBelongsTo)) {
-              const createdAccount = await AccountModel.insert({
-                name,
-                active
-              }, overrideBelongsTo)
-              res.status(201).json(createdAccount)
-            } else {
-              res.status(403).json({ error: `no permissions to override account ${overrideBelongsTo}` })
-            }
-          } else {
-            const createdAccount = await AccountModel.insert({
-              name,
-              active
-            }, overrideBelongsTo)
-            res.status(201).json(createdAccount)
-          }
+          const createdAccount = await AccountModel.insert({
+            name,
+            active
+          }, accountId)
+          res.status(201).json(createdAccount)
         }
       } catch (err) {
         logger.error('Error occurred while creating account ', err)
@@ -136,6 +158,7 @@ module.exports = AccountModel => {
     listAccounts,
     getAccount,
     createAccount,
+    createAccountsAccount,
     childrenAccounts
   }
 }

@@ -8,6 +8,7 @@ exports.up = function (knex) {
       table.uuid('id').primary()
       table.string('name').notNullable()
       table.string('status')
+      table.boolean('active').defaultTo(true)
       // belongsTo is used as the parent/child relationship for accounts
       table.uuid('belongs_to').notNullable()
       table.foreign('belongs_to').references('accounts.id')

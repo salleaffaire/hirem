@@ -9,6 +9,7 @@ Users in Account ACME have READ and WRITE access on Pizza resources as never bee
 ## Docs
 
 Hierarchical Resource Language [HRL](./docs/language.md)
+API [API](./docs/api.md)
 
 ## Start postgres for development
 
@@ -79,14 +80,52 @@ AUTH_DISABLED="1" npm start
 ## API
 
 ```rest
-GET     /accounts
-GET     /accounts/{accountId}
-POST    /accounts
+  x GET     /accounts
+  x GET     /accounts/{accountId}
+  x POST    /accounts
 
-GET     /users
-GET     /accounts/{accountId}/users
-GET     /accounts/{accountId}/users/{userId}
-POST    /accounts/{accountId}/users
+  x GET     /users
+  x GET     /accounts/{accountId}/users
+  x GET     /accounts/{accountId}/users/{userId}
+  x POST    /accounts/{accountId}/users
+  x GET     /accounts/{accountId}/users/{userId}/roles                       // List all roles for a user
+  x POST    /accounts/{accountId}/users/{userId}/roles/{roleId}              // Add role to user (Role Binding)
+  x DELETE  /accounts/{accountId}/users/{userId}/roles/{roleId}              // Remove a role from a user
+
+  x GET     /permissions
+    GET     /accounts/{accountId}/permissions
+    GET     /accounts/{accountId}/permissions/{permissionId}
+
+  x GET     /roles
+  x GET     /accounts/{accountId}/roles
+  o GET     /accounts/{accountId}/roles/{roleId}
+    POST    /accounts/{accountId}/roles
+    POST    /accounts/{accountId}/roles/{roleId}/permissions                 // Add a permission to role
+    DELETE  /accounts/{accountId}/roles/{roleId}/permissions/{permissionId}  // Remove a permission from role
+
+    GET     /userinfo
+```
+
+## Seting up Auth0
+
+Auth0 domain: `dev-f7mspsfl.us.auth0.com`
+Auth0 Client Id: `0StS8S9gCVo52a3MntUaXiyRkj6a2csB`
+
+```bash
+AUTH0_IMS_CLIENT_ID=jyEL6syWBLzTQ9cXdWZcaJqM8J3MquWt AUTH0_IMS_CLIENT_SECRET=<>
+ OAUTH_AUDIENCE=https://dev.hirem.acme.com npm start
+```
+
+Get access token
+
+```bash
+curl --request POST \
+  --url 'https://dev-f7mspsfl.us.auth0.com/oauth/token' \
+  --header 'content-type: application/x-www-form-urlencoded' \
+  --data grant_type=client_credentials \
+  --data client_id=jyEL6syWBLzTQ9cXdWZcaJqM8J3MquWt \
+  --data client_secret=<> \
+  --data audience=https://dev.hirem.acme.com
 ```
 
 ## Misc

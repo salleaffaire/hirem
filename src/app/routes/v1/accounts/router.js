@@ -10,6 +10,6 @@ module.exports = ({ model, authHandler }) => {
   router.get('/accounts/:accountId', authHandler(authorizationHandler('hirem.accounts', 'r')), controller.getAccount)
   router.get('/accounts', authHandler(authorizationHandler('hirem.accounts', 'r')), controller.listAccounts)
   router.post('/accounts', authHandler(authorizationHandler('hirem.accounts', 'w')), controller.createAccount)
-
+  router.post('/accounts/accountId', authHandler(authorizationHandler('hirem.accounts', 'w')), controller.createAccountsAccount)
   return router
 }
